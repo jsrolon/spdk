@@ -60,9 +60,9 @@ fi
 timing_enter db_bench_build
 
 pushd $DB_BENCH_DIR
-if [ -z "$SKIP_GIT_CLEAN" ]; then
-	git clean -x -f -d
-fi
+#if [ -z "$SKIP_GIT_CLEAN" ]; then
+#	git clean -x -f -d
+#fi
 
 EXTRA_CXXFLAGS=""
 GCC_VERSION=$(cc -dumpversion | cut -d. -f1)
@@ -72,7 +72,7 @@ elif ((GCC_VERSION >= 11)); then
 	EXTRA_CXXFLAGS+="-Wno-error=range-loop-construct"
 fi
 
-$MAKE db_bench $MAKEFLAGS $MAKECONFIG DEBUG_LEVEL=0 SPDK_DIR=../spdk EXTRA_CXXFLAGS="$EXTRA_CXXFLAGS"
+#$MAKE db_bench $MAKEFLAGS $MAKECONFIG DEBUG_LEVEL=0 SPDK_DIR=../spdk EXTRA_CXXFLAGS="$EXTRA_CXXFLAGS"
 popd
 
 timing_exit db_bench_build
@@ -93,9 +93,9 @@ if [ $RUN_NIGHTLY -eq 1 ]; then
 	DURATION=60
 	NUM_KEYS=100000000
 else
-	CACHE_SIZE=2048
-	DURATION=20
-	NUM_KEYS=20000000
+	CACHE_SIZE=4096
+	DURATION=600
+	NUM_KEYS=100000000
 fi
 # Make sure that there's enough memory available for the mempool. Unfortunately,
 # db_bench doesn't seem to allocate memory from all numa nodes since all of it
@@ -104,8 +104,8 @@ fi
 # with the right amount not allowing setup.sh to split it by using the global
 # nr_hugepages setting. Instead of bypassing it completely, we use it to also
 # get the right size of hugepages.
-HUGEMEM=$((CACHE_SIZE + 1024)) HUGENODE=0 \
-	"$rootdir/scripts/setup.sh"
+HUGEMEM=$((CACHE_SIZE + 1024)) HUGENODE=0 PCI_ALLOWED="0000:$(lspci | awk '/Non-Volatile/ { print $1 }')" DRIVER_OVERRIDE="/nutanix-src/dpdk-kmods/linux/igb_uio/igb_uio.ko" \
+      "$rootdir/scripts/setup.sh"
 
 cd $RESULTS_DIR
 cp $testdir/common_flags.txt insert_flags.txt
