@@ -13,7 +13,7 @@
 --db=/mnt/rocksdb
 --sync=0
 --compression_type=none
---stats_interval=1000000
+--stats_interval_seconds=10
 --compression_ratio=1
 --disable_data_sync=0
 --target_file_size_base=67108864
