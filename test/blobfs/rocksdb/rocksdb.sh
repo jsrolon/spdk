@@ -103,9 +103,17 @@ fi
 # + some_overhead (1G) of pages but only on node0 to make sure that we end up
 # with the right amount not allowing setup.sh to split it by using the global
 # nr_hugepages setting. Instead of bypassing it completely, we use it to also
-# get the right size of hugepages.
-HUGEMEM=$((CACHE_SIZE + 1024)) HUGENODE=0 PCI_ALLOWED="0000:$(lspci | awk '/Non-Volatile/ { print $1 }')" DRIVER_OVERRIDE="/nutanix-src/dpdk-kmods/linux/igb_uio/igb_uio.ko" \
-      "$rootdir/scripts/setup.sh"
+# get the right size of hugepages
+if [ $BAREMETAL -eq 1 ]; then
+	HUGEMEM=$((CACHE_SIZE + 1024)) HUGENODE=0 PCI_ALLOWED="0000:bc:00.0" "$rootdir/scripts/setup.sh"
+else
+	HUGEMEM=$((CACHE_SIZE + 1024)) HUGENODE=0 PCI_ALLOWED="0000:$(lspci | awk '/Non-Volatile/ { print $1 }')" DRIVER_OVERRIDE="/nutanix-src/dpdk-kmods/linux/igb_uio/igb_uio.ko" \
+		"$rootdir/scripts/setup.sh"
+fi
+
+until [[ $(awk '/^HugePages_Total:/ {print $2}' /proc/meminfo) -eq "12000" ]]; do
+	sleep 3
+done
 
 cd $RESULTS_DIR
 cp $testdir/common_flags.txt insert_flags.txt
