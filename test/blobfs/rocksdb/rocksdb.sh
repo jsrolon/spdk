@@ -111,7 +111,7 @@ else
 		"$rootdir/scripts/setup.sh"
 fi
 
-until [[ $(awk '/^HugePages_Total:/ {print $2}' /proc/meminfo) -eq "12000" ]]; do
+until [[ $(awk '/^HugePages_Total:/ {print $2}' /proc/meminfo) -eq $(((CACHE_SIZE + 1024)/2)) ]]; do
 	sleep 3
 done
 
