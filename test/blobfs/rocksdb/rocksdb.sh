@@ -128,26 +128,6 @@ EOL
 cp $testdir/common_flags.txt randread_flags.txt
 cat << EOL >> randread_flags.txt
 --benchmarks=readrandom
---threads=16
---duration=$DURATION
---disable_wal=1
---use_existing_db=1
---num=$NUM_KEYS
-EOL
-
-cp $testdir/common_flags.txt overwrite_flags.txt
-cat << EOL >> overwrite_flags.txt
---benchmarks=overwrite
---threads=1
---duration=$DURATION
---disable_wal=1
---use_existing_db=1
---num=$NUM_KEYS
-EOL
-
-cp $testdir/common_flags.txt readwrite_flags.txt
-cat << EOL >> readwrite_flags.txt
---benchmarks=readwhilewriting
 --threads=4
 --duration=$DURATION
 --disable_wal=1
@@ -155,16 +135,47 @@ cat << EOL >> readwrite_flags.txt
 --num=$NUM_KEYS
 EOL
 
-cp $testdir/common_flags.txt writesync_flags.txt
-cat << EOL >> writesync_flags.txt
---benchmarks=overwrite
---threads=1
+cp $testdir/common_flags.txt readseq_flags.txt
+cat << EOL >> readseq_flags.txt
+--benchmarks=readseq
+--threads=4
 --duration=$DURATION
---disable_wal=0
+--disable_wal=1
 --use_existing_db=1
---sync=1
 --num=$NUM_KEYS
+--reads=$((NUM_KEYS*3))
 EOL
+
+# cp $testdir/common_flags.txt overwrite_flags.txt
+# cat << EOL >> overwrite_flags.txt
+# --benchmarks=overwrite
+# --threads=1
+# --duration=$DURATION
+# --disable_wal=1
+# --use_existing_db=1
+# --num=$NUM_KEYS
+# EOL
+
+# cp $testdir/common_flags.txt readwrite_flags.txt
+# cat << EOL >> readwrite_flags.txt
+# --benchmarks=readwhilewriting
+# --threads=4
+# --duration=$DURATION
+# --disable_wal=1
+# --use_existing_db=1
+# --num=$NUM_KEYS
+# EOL
+
+# cp $testdir/common_flags.txt writesync_flags.txt
+# cat << EOL >> writesync_flags.txt
+# --benchmarks=overwrite
+# --threads=1
+# --duration=$DURATION
+# --disable_wal=0
+# --use_existing_db=1
+# --sync=1
+# --num=$NUM_KEYS
+# EOL
 
 cp $testdir/common_flags.txt readrandwriterand_flags.txt
 cat << EOL >> readrandwriterand_flags.txt
@@ -179,11 +190,12 @@ cat << EOL >> readrandwriterand_flags.txt
 EOL
 
 run_test "rocksdb_insert" run_step insert
+run_test "rocksdb_readseq" run_step readseq
 #run_test "rocksdb_overwrite" run_step overwrite
 run_test "rocksdb_readrandwriterand" run_step readrandwriterand
 #run_test "rocksdb_readwrite" run_step readwrite
 #run_test "rocksdb_writesync" run_step writesync
-#run_test "rocksdb_randread" run_step randread
+run_test "rocksdb_randread" run_step randread
 
 trap - SIGINT SIGTERM EXIT
 

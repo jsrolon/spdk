@@ -330,7 +330,7 @@ function set_test_storage() {
 	done < <(df -T | grep -v Filesystem)
 
 	printf '* Looking for test storage...\n' >&2
-
+	echo "${storage_candidates[@]}"
 	local target_space new_size
 	for target_dir in "${storage_candidates[@]}"; do
 		# FreeBSD's df is lacking the --output arg
