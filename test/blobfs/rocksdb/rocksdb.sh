@@ -95,7 +95,7 @@ if [ $RUN_NIGHTLY -eq 1 ]; then
 else
 	CACHE_SIZE=4096
 	DURATION=600
-	NUM_KEYS=100000000
+	NUM_KEYS=10000000
 fi
 # Make sure that there's enough memory available for the mempool. Unfortunately,
 # db_bench doesn't seem to allocate memory from all numa nodes since all of it
@@ -143,7 +143,7 @@ cat << EOL >> readseq_flags.txt
 --disable_wal=0
 --use_existing_db=0
 --num=$NUM_KEYS
---reads=$((NUM_KEYS*3))
+--reads=$((NUM_KEYS*2))
 EOL
 
 # cp $testdir/common_flags.txt overwrite_flags.txt
