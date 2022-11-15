@@ -119,8 +119,8 @@ cd $RESULTS_DIR
 cp $testdir/common_flags.txt insert_flags.txt
 cat << EOL >> insert_flags.txt
 --benchmarks=fillseq
---threads=4
---disable_wal=1
+--threads=1
+--disable_wal=0
 --use_existing_db=0
 --num=$NUM_KEYS
 EOL
@@ -128,20 +128,20 @@ EOL
 cp $testdir/common_flags.txt randread_flags.txt
 cat << EOL >> randread_flags.txt
 --benchmarks=readrandom
---threads=4
+--threads=1
 --duration=$DURATION
---disable_wal=1
---use_existing_db=1
+--disable_wal=0
+--use_existing_db=0
 --num=$NUM_KEYS
 EOL
 
 cp $testdir/common_flags.txt readseq_flags.txt
 cat << EOL >> readseq_flags.txt
 --benchmarks=readseq
---threads=4
+--threads=1
 --duration=$DURATION
---disable_wal=1
---use_existing_db=1
+--disable_wal=0
+--use_existing_db=0
 --num=$NUM_KEYS
 --reads=$((NUM_KEYS*3))
 EOL
@@ -177,14 +177,23 @@ EOL
 # --num=$NUM_KEYS
 # EOL
 
+cp $testdir/common_flags.txt randwrite_flags.txt
+cat << EOL >> randwrite_flags.txt
+--benchmarks=fillrandom
+--threads=1
+--duration=$DURATION
+--disable_wal=0
+--use_existing_db=0
+--num=$NUM_KEYS
+EOL
+
 cp $testdir/common_flags.txt readrandwriterand_flags.txt
 cat << EOL >> readrandwriterand_flags.txt
 --benchmarks=readrandomwriterandom
---threads=4
+--threads=1
 --duration=$DURATION
 --disable_wal=0
---use_existing_db=1
---sync=1
+--use_existing_db=0
 --readwritepercent=50
 --num=$NUM_KEYS
 EOL
@@ -195,6 +204,7 @@ run_test "rocksdb_readseq" run_step readseq
 run_test "rocksdb_readrandwriterand" run_step readrandwriterand
 #run_test "rocksdb_readwrite" run_step readwrite
 #run_test "rocksdb_writesync" run_step writesync
+run_test "rocksdb_randwrite" run_step randwrite
 run_test "rocksdb_randread" run_step randread
 
 trap - SIGINT SIGTERM EXIT
