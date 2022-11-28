@@ -20,7 +20,7 @@
 --max_write_buffer_number=2
 --write_buffer_size=10000000
 --max_bytes_for_level_multiplier=10
---max_background_compactions=1
+--max_background_compactions=10
 --num_levels=10
 --delete_obsolete_files_period_micros=3000000
 --max_grandparent_overlap_factor=10

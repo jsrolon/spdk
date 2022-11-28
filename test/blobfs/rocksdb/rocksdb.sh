@@ -95,7 +95,7 @@ if [ $RUN_NIGHTLY -eq 1 ]; then
 else
 	CACHE_SIZE=4096
 	DURATION=600
-	NUM_KEYS=10000000
+	NUM_KEYS=100000000
 fi
 # Make sure that there's enough memory available for the mempool. Unfortunately,
 # db_bench doesn't seem to allocate memory from all numa nodes since all of it
@@ -131,7 +131,7 @@ cat << EOL >> randread_flags.txt
 --threads=1
 --duration=$DURATION
 --disable_wal=0
---use_existing_db=0
+--use_existing_db=1
 --num=$NUM_KEYS
 EOL
 
@@ -141,41 +141,9 @@ cat << EOL >> readseq_flags.txt
 --threads=1
 --duration=$DURATION
 --disable_wal=0
---use_existing_db=0
+--use_existing_db=1
 --num=$NUM_KEYS
---reads=$((NUM_KEYS*2))
 EOL
-
-# cp $testdir/common_flags.txt overwrite_flags.txt
-# cat << EOL >> overwrite_flags.txt
-# --benchmarks=overwrite
-# --threads=1
-# --duration=$DURATION
-# --disable_wal=1
-# --use_existing_db=1
-# --num=$NUM_KEYS
-# EOL
-
-# cp $testdir/common_flags.txt readwrite_flags.txt
-# cat << EOL >> readwrite_flags.txt
-# --benchmarks=readwhilewriting
-# --threads=4
-# --duration=$DURATION
-# --disable_wal=1
-# --use_existing_db=1
-# --num=$NUM_KEYS
-# EOL
-
-# cp $testdir/common_flags.txt writesync_flags.txt
-# cat << EOL >> writesync_flags.txt
-# --benchmarks=overwrite
-# --threads=1
-# --duration=$DURATION
-# --disable_wal=0
-# --use_existing_db=1
-# --sync=1
-# --num=$NUM_KEYS
-# EOL
 
 cp $testdir/common_flags.txt randwrite_flags.txt
 cat << EOL >> randwrite_flags.txt
@@ -200,12 +168,10 @@ EOL
 
 run_test "rocksdb_insert" run_step insert
 run_test "rocksdb_readseq" run_step readseq
-#run_test "rocksdb_overwrite" run_step overwrite
-run_test "rocksdb_readrandwriterand" run_step readrandwriterand
-#run_test "rocksdb_readwrite" run_step readwrite
-#run_test "rocksdb_writesync" run_step writesync
-run_test "rocksdb_randwrite" run_step randwrite
+run_test "rocksdb_readseq" run_step readseq # doing it twice to give a chance for possible compactions to finish 
 run_test "rocksdb_randread" run_step randread
+run_test "rocksdb_readrandwriterand" run_step readrandwriterand
+run_test "rocksdb_randwrite" run_step randwrite
 
 trap - SIGINT SIGTERM EXIT
 
